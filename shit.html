@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ghost Animation</title>
+</head>
+<body>
+    <canvas height="1200%" width="1200%" id="canvas" viewbox="0 0 2000 1000"></canvas>
+    <script>
+var X = 0;
+var Y = 0;
+        let canvas = document.getElementsByTagName("canvas")[0];
+        
+        let ghosts = [];
+        let colors = ["red", "green", "blue", "yellow", "cyan", "magenta", "black", "purple", "orange"];
+        
+
+        //You'll need to create two event listeners.
+
+        /* You'll need a click event listener on the canvas that draws a randomly
+        colored ghost at the precise location of the click and places a JavaScript
+        reference to that ghost into the ghosts array*/
+        
+        function draw(x, y, k) {//console.log(k);
+    var ctx = canvas.getContext('2d');
+    
+    // Clear previous drawings
+    //ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+let dx=x+30-60-X;let dy= y+60-90-Y;let mag=Math.sqrt(dx**2+dy**2)/6;let d1=dx/mag;let d2=dy/mag;
+dx=x+90-60-X; dy= y+60-90-Y; mag=Math.sqrt(dx**2+dy**2)/6;let d3=dx/mag;let d4=dy/mag;
+
+    // Define the shapes to draw
+var shapes = [
+        { type: 'circle', cx: x + 20, cy: y + 160, r: 20},
+        { type: 'circle', cx: x + 60, cy: y + 160, r: 20},
+        { type: 'circle', cx: x + 100, cy: y + 160, r: 20},
+        { type: 'circle', cx: x + 60, cy: y + 60, r: 60},
+        { type: 'rect', x: x, y: y + 60, width: 120, height: 100},
+        { type: 'circle', cx: x + 30, cy: y + 60, r: 12},
+        { type: 'circle', cx: x + 90, cy: y + 60, r: 12},
+        { type: 'circle', cx: x + 30-d1, cy: y + 60-d2, r: 6},{ type: 'circle', cx: x + 90-d3, cy: y + 60-d4, r: 6},
+    ];
+    
+    // Loop through each shape and draw it
+let i=0;
+    shapes.forEach(function(shape) {i++;
+        ctx.fillStyle = k;
+if (i===6 || i===7) {ctx.fillStyle = "white";}
+        
+        switch (shape.type) {
+            case 'circle':
+                ctx.beginPath();
+                ctx.arc(shape.cx-60, shape.cy-90, shape.r, 0, 2 * Math.PI);
+                ctx.fill();
+                break;
+            case 'rect':
+                ctx.fillRect(shape.x-60, shape.y-90, shape.width, shape.height);
+                break;
+            default:
+                console.error('Unsupported shape type: ' + shape.type);
+        }
+    });
+}
+
+document.addEventListener("click", (event) => {ghosts.push([event.clientX, event.clientY, colors[Math.floor(9*Math.random())]]);
+
+    var ctx = canvas.getContext('2d');
+    
+    // Clear previous drawings
+    ctx.clearRect(0, 0, canvas.width, canvas.height);for (ghost of ghosts) {let [x, y, c] = ghost; draw(x,y,c);}
+});
+
+        /* You'll need a mousemove listener on the canvas that makes the eyes
+        of each ghost in the ghosts array move in the direction of the current
+        mouse coordinates */
+addEventListener('mousemove', (p) => {X = p.pageX;Y=p.pageY;
+
+    var ctx = canvas.getContext('2d');
+    
+    // Clear previous drawings
+    ctx.clearRect(0, 0, canvas.width, canvas.height);for (ghost of ghosts) {let [x, y, c] = ghost; draw(x,y,c);
+}
+
+});
+
+
+    </script>
+</body>
+</html>
