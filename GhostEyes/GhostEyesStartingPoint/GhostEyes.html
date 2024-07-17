@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ghosteyes</title>
+</head>
+<body>
+    <svg id="mySvg" width="1200" height="800"></svg>
+    <script>
+        let svg = document.getElementById('mySvg');
+
+        let ghosts = [];
+        let colors = ["red", "green", "blue", "yellow", "cyan", "magenta", "black", "purple", "orange"];
+
+
+        function drawGhost(x, y, color) {
+            const ghostWidth = 60;
+            const ghostHeight = 40;
+            const headRadius = ghostWidth / 2;
+            const tailRadius = ghostWidth / 6;
+
+
+            let ghostGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+
+            //ghost head
+            let head = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            head.setAttribute('cx', x);
+            head.setAttribute('cy', y);
+            head.setAttribute('r', headRadius);
+            head.setAttribute('fill', color);
+            ghostGroup.appendChild(head);
+
+            //ghost body 
+            let body = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            body.setAttribute('x', x - headRadius);
+            body.setAttribute('y', y);
+            body.setAttribute('width', ghostWidth);
+            body.setAttribute('height', ghostHeight);
+            body.setAttribute('fill', color);
+            ghostGroup.appendChild(body);
+
+            for (let i = 0; i < 3; i++) {
+                let tail = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                tail.setAttribute('cx', x - ghostWidth/2 + tailRadius + (tailRadius * 2 * i));
+                tail.setAttribute('cy', y + ghostHeight);
+                tail.setAttribute('r', tailRadius);
+                tail.setAttribute('fill', color);
+                ghostGroup.appendChild(tail);
+            }
+
+            //eyes
+            let eyeLeft = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            eyeLeft.setAttribute('cx', x - headRadius / 2);
+            eyeLeft.setAttribute('cy', y - headRadius / 3);
+            eyeLeft.setAttribute('r', headRadius / 6);
+            eyeLeft.setAttribute('fill', 'white');
+            ghostGroup.appendChild(eyeLeft);
+
+            let eyeRight = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            eyeRight.setAttribute('cx', x + headRadius / 2);
+            eyeRight.setAttribute('cy', y - headRadius / 3);
+            eyeRight.setAttribute('r', headRadius / 6);
+            eyeRight.setAttribute('fill', 'white');
+            ghostGroup.appendChild(eyeRight);
+
+            //pupils
+            let pupilLeft = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            pupilLeft.setAttribute('cx', x - headRadius / 2);
+            pupilLeft.setAttribute('cy', y - headRadius / 3);
+            pupilLeft.setAttribute('r', headRadius / 12);
+            pupilLeft.setAttribute('fill', 'blue');
+            ghostGroup.appendChild(pupilLeft);
+
+            let pupilRight = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            pupilRight.setAttribute('cx', x + headRadius / 2);
+            pupilRight.setAttribute('cy', y - headRadius / 3);
+            pupilRight.setAttribute('r', headRadius / 12);
+            pupilRight.setAttribute('fill', 'blue');
+            ghostGroup.appendChild(pupilRight);
+
+            svg.appendChild(ghostGroup);
+
+            return {
+                group: ghostGroup,
+                eyeLeft: eyeLeft,
+                eyeRight: eyeRight,
+                pupilLeft: pupilLeft,
+                pupilRight: pupilRight
+            };
+        }
+
+        function updateEyes(mouseX, mouseY) {
+            ghosts.forEach(ghost => {
+                let bbox = ghost.group.getBBox();
+                let ghostX = bbox.x + bbox.width / 2;
+                let ghostY = bbox.y + bbox.height / 4;
+
+                let dxLeft = mouseX - (ghostX - bbox.width / 4);
+                let dyLeft = mouseY - ghostY;
+                let angleLeft = Math.atan2(dyLeft, dxLeft);
+
+                let dxRight = mouseX - (ghostX + bbox.width / 4);
+                let dyRight = mouseY - ghostY;
+                let angleRight = Math.atan2(dyRight, dxRight);
+
+
+                let eyeRadius = bbox.width / 12;
+                let maxPupilOffset = eyeRadius/2; 
+                let offsetLeft = Math.min(Math.sqrt(dxLeft * dxLeft + dyLeft * dyLeft), maxPupilOffset);
+                let offsetRight = Math.min(Math.sqrt(dxRight * dxRight + dyRight * dyRight), maxPupilOffset);
+
+                ghost.pupilLeft.setAttribute('cx', ghostX - bbox.width / 4 + Math.cos(angleLeft) * offsetLeft);
+                ghost.pupilLeft.setAttribute('cy', ghostY + Math.sin(angleLeft) * offsetLeft);
+
+                ghost.pupilRight.setAttribute('cx', ghostX + bbox.width / 4 + Math.cos(angleRight) * offsetRight);
+                ghost.pupilRight.setAttribute('cy', ghostY + Math.sin(angleRight) * offsetRight);
+            });
+        }
+        svg.addEventListener('mousemove', (event) => {
+            updateEyes(event.clientX, event.clientY);
+        });
+
+
+        svg.addEventListener('click', (event) => {
+
+            let rect = svg.getBoundingClientRect();
+            let x = event.clientX - rect.left;
+            let y = event.clientY - rect.top;
+
+
+            let color = colors[Math.floor(9 * Math.random())];
+
+            let ghost = drawGhost(x, y, color);
+            ghosts.push(ghost);
+        });
+
+    </script>
+</body>
+</html>
